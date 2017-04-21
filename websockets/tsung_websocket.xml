@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/local/Cellar/tsung/1.6.0/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="notice" version="1.0">
+  <clients>
+    <client host="localhost" use_controller_vm="true" maxusers="1000" />
+  </clients>
+
+  <servers>
+    <server host="169.231.11.184" port="8080" type="websocket" />
+  </servers>
+
+  <load>
+    <arrivalphase phase="1" duration="120" unit="second">
+      <users maxnumber="100" arrivalrate="10" unit="second" />
+    </arrivalphase>
+  </load>
+
+  <sessions>
+    <session name="websocket" probability="80" type="ts_websocket">
+        <request subst="true">
+             <websocket type="connect" path="/"></websocket>
+        </request>
+        <thinktime value="40" random="true"></thinktime>
+        <request>
+          <websocket type="close"></websocket>
+        </request>
+    </session>
+
+    <session name="websocket-send" probability="20" type="ts_websocket">
+        <request subst="true">
+             <websocket type="connect" path="/"></websocket>
+        </request>
+        <request>
+            <websocket type="message">hey</websocket>
+        </request>
+        <thinktime value="20" random="true"></thinktime>
+        <request>
+          <websocket type="close"></websocket>
+        </request>
+    </session>    
+  </sessions>
+</tsung>
