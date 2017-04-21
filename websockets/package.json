@@ -1,0 +1,22 @@
+{
+  "name": "websockets",
+  "version": "1.0.0",
+  "description": "websocket broadcaster",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/alanbuzdar/NodeJS-Runtime.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alanbuzdar/NodeJS-Runtime/issues"
+  },
+  "homepage": "https://github.com/alanbuzdar/NodeJS-Runtime#readme",
+  "dependencies": {
+    "ws": "^2.3.1"
+  }
+}
