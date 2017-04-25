@@ -1,18 +1,26 @@
 // Node server that broadcasts all websocket messages to all clients
-// Code taken from example at: https://github.com/websockets/ws
-
+// docs https://github.com/websockets/ws/blob/master/doc/ws.md
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ perMessageDeflate: false, port: 8080,  });
+const wss = new WebSocket.Server({ perMessageDeflate: false, port: 8080  });
+
+var connections = setInterval( function() {
+  console.log(wss.clients.size);
+}, 5*1000);
 
 wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(data) {
-    console.log(data);
-    // Broadcast to everyone else.
-    wss.clients.forEach(function each(client) {
-    //   if (client.readyState === WebSocket.OPEN) {
-    //     client.send(data);
-    //   }
+    // Send keep alive messages. Close if no response.
+    ws.keepAlive = false;
+    var interval = setInterval(function() {
+        if (ws.keepAlive) {
+            ws.close();
+        } else {
+            ws.ping(null, null, true);
+            ws.keepAlive = true;
+        }
+    }, 5*1000); // milliseconds between pings
+    ws.on("pong", function() { 
+        ws.keepAlive = false; 
     });
-  });
+
 });
