@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 var hasFailed = false;
 for(var i=0; i<1000; i++) {
     const clientNum = i;
-    const ws = new WebSocket('ws://169.231.11.184:8080', {
+    const ws = new WebSocket('ws://localhost:8080', {
     perMessageDeflate: false
         });
 

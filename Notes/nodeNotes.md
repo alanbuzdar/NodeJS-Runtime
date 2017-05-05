@@ -87,11 +87,26 @@ nextTickQueue processed between each layer of event-loop. Whenever you call next
 
 Only use nextTick if you want immediate action, like listening on a port instantly, so that connection isnt missed between Queueing and Check phase.
 
-### Scaling Node
+### MultiCore
+
+http://stackoverflow.com/questions/2387724/node-js-on-multi-core-machines
 
 Single threaded so doesn't autoscale to multiple cores. 
 
 Memory limit of only 1.5gb!
+
+
+Three Potential Solutions:
+
+1. Fork child/worker processes and coordinate them yourself
+
+2. Run one Node process on each core. 
+
+3. Use Cluster Module!
+
+### Cluster Module
+
+https://nodejs.org/docs/latest/api/cluster.html
 
 Way of scaling is to fork multiple processes, called "clustering".
 
