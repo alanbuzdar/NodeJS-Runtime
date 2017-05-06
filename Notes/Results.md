@@ -12,7 +12,7 @@ Did not improve with starting node with more memory, disabling incremental GC, o
 
 Running it on both cores allows me to get up to 140k+ connections simultaneously on an m3 medium server! This was a big increase
 
-My main problem right now is not the server side but that the clients run out of get an "EADDRNOTAVAIL" error. Need to investigate.
+My main problem right now is not the server side but that the clients. Which get an "EADDRNOTAVAIL" error. Need to investigate.
 
 EADDRNOTAVAIL has local port 0.
 
@@ -20,3 +20,10 @@ Server side still has surprisingly low CPU/Memory usage.
 
 CPU usage spikes when connections established but falls greatly when just maintaining connections
 
+EADDRNOTAVAIL usually happens when using port you're not allowed to.
+
+Surprised to reach 140k+ connections so quickly without much load. :)
+
+I was going to use sticky sessions as mentioned in one tutorial but that isn't needed for WS websockets
+
+Sticky sessions are only needed for Socket.io

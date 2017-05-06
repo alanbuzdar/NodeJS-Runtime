@@ -2,9 +2,19 @@
 
 ssh -i "runtime.pem" IP
 
-https://github.com/alanbuzdar/NodeJS-Runtime.git
+git clone https://github.com/alanbuzdar/NodeJS-Runtime.git
 
-node --nouse-idle-notification--max-new-space-size=2048--max-old-space-size=4096 ./server/websocketserver.js
+sudo apt-get install nodejs
+
+npm install
+
+cd NodeJS-Runtime/websockets
+
+node --nouse-idle-notification--max-old-space-size=4096 index.js
+
+--nouse-idle-notification = Don't use incremental GC
+
+--Old space size = size of "old space" in heap for GC
 
 /etc/security/limits.d/custom.conf
 
