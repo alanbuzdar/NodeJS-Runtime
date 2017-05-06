@@ -10,7 +10,7 @@ Did not improve with starting node with more memory, disabling incremental GC, o
 
 **Deployed in Cluster Mode 5/5
 
-Running it on both cores allows me to get up to 140k+ connections simultaneously on an m3 medium server! This was a big increase
+Running it on both cores allows me to get up to 70k+ connections simultaneously on an m3 medium server! (miscalculated earlier)
 
 My main problem right now is not the server side but that the clients. Which get an "EADDRNOTAVAIL" error. Need to investigate.
 
@@ -22,7 +22,7 @@ CPU usage spikes when connections established but falls greatly when just mainta
 
 EADDRNOTAVAIL usually happens when using port you're not allowed to.
 
-Surprised to reach 140k+ connections so quickly without much load. :)
+Surprised to reach 70k+ connections so quickly without much load. 
 
 I was going to use sticky sessions as mentioned in one tutorial but that isn't needed for WS websockets
 
