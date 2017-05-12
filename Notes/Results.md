@@ -89,3 +89,22 @@ events.js:141
 Experimented with the server using 4 workers instead of 2. This didn't help at all and failures still start at around 100 or 105k.
 
 I noticed this time that for some reason one of the node processes uses 100 pct CPU at the time of failure while the others don't.
+
+### Running without GC 
+
+no change.
+
+### Change keep alives to every 25 seconds instead of 5
+
+failed at 115k. With error:
+
+Error: socket hang up
+    at createHangUpError (_http_client.js:202:15)
+    at Socket.socketOnEnd (_http_client.js:287:23)
+    at emitNone (events.js:72:20)
+    at Socket.emit (events.js:166:7)
+    at endReadableNT (_stream_readable.js:905:12)
+    at nextTickCallbackWith2Args (node.js:441:9)
+    at process._tickCallback (node.js:355:17)
+events.js:141
+      throw er; // Unhandled 'error' event

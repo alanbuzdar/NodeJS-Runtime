@@ -4,6 +4,7 @@ const WebSocket = require('ws');
 const cluster = require('cluster');
 const cpu = require('os').cpus().length
 if (cluster.isMaster) {
+    cluster.schedulingPolicy = cluster.SCHED_RR;
     // One Process Per Core
     for(i=0; i<cpu; i++)
         cluster.fork();
