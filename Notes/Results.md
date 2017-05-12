@@ -83,3 +83,9 @@ Error: read ECONNRESET
     at TCP.onread (net.js:544:26)
 events.js:141
       throw er; // Unhandled 'error' event
+
+### Tried with 4 Workers instead (2 cores)
+
+Experimented with the server using 4 workers instead of 2. This didn't help at all and failures still start at around 100 or 105k.
+
+I noticed this time that for some reason one of the node processes uses 100 pct CPU at the time of failure while the others don't.
