@@ -48,3 +48,38 @@ At a little above 100k connections, clients started getting: ECONNRESET messages
 Ran it again to see what happened and same thing happened at 100k again. Once that error happens it goes from 100k connections to only 20k.
 
 perhaps the connections are being garbage collected?
+
+### Third run
+
+For this run, i increased I mad all 3 clients attempt to do 60k connections. This caused an error at 110k (so basically the same). 
+
+The main difference with this test is my server actually failed this time and reached 100 CPU Usage.
+
+Server Error:
+
+_http_server.js:345
+  var external = socket._handle._externalStream;
+                               ^
+
+TypeError: Cannot read property '_externalStream' of null
+    at Server.connectionListener (_http_server.js:345:32)
+    at emitOne (events.js:77:13)
+    at Server.emit (events.js:169:7)
+    at Object.onconnection (net.js:1433:8)
+    at onconnection (cluster.js:652:26)
+    at Worker.onmessage (cluster.js:533:9)
+    at process.<anonymous> (cluster.js:714:8)
+    at emitTwo (events.js:92:20)
+    at process.emit (events.js:172:7)
+    at handleMessage (internal/child_process.js:689:10)
+
+Client Error: 
+
+throw er; // Unhandled 'error' event
+      ^
+
+Error: read ECONNRESET
+    at exports._errnoException (util.js:870:11)
+    at TCP.onread (net.js:544:26)
+events.js:141
+      throw er; // Unhandled 'error' event
