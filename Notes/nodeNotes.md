@@ -115,6 +115,7 @@ clusters share server ports (Masters and workers)
 Two methods of distributing connections:
 
 1. (Default) Round Robin: Master listens, accepts, and distributes to workers using round robin + smarts to avoid overloading
+
 2. Master creates listen socket and sends it to interested workers. Should work best, but OS scheduling randomness makes it work poorly.
 
 

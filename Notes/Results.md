@@ -108,3 +108,18 @@ Error: socket hang up
     at process._tickCallback (node.js:355:17)
 events.js:141
       throw er; // Unhandled 'error' event
+
+
+Switching from round-robin scheduling algorithm to OS default scheduling didnt help
+
+### Getting rid of Keep-alives all-together
+
+Getting rid of keep alives allowed me to get 125k connections before any errors. 
+
+Once again, the error i got was "socket hang up".
+
+One core had: 60839 connections
+
+While other had: 65520 connections
+
+To truly get to the bottom of the reason that can't get more connections I will need to find a better way to profile the performance.

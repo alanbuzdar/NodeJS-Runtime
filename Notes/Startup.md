@@ -6,6 +6,10 @@ git clone https://github.com/alanbuzdar/NodeJS-Runtime.git
 
 sudo apt-get install nodejs
 
+sudo apt-get update
+
+sudo apt-get install npm
+
 npm install
 
 cd NodeJS-Runtime/websockets
@@ -33,4 +37,8 @@ net.ipv4.netfilter.ip_conntrack_max = 1048576
 net.nf_conntrack_max = 1048576
 
 ### 
+sudo su
+
 echo "1024 65535" >/proc/sys/net/ipv4/ip_local_port_range
+
+exit
