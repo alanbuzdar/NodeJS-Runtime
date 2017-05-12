@@ -10,7 +10,9 @@ npm install
 
 cd NodeJS-Runtime/websockets
 
-node --nouse-idle-notification--max-old-space-size=4096 index.js
+nodejs --nouse-idle-notification --max-old-space-size=4096 index.js
+
+nodejs --nouse-idle-notification --max-old-space-size=4096 client.js
 
 --nouse-idle-notification = Don't use incremental GC
 
@@ -29,3 +31,6 @@ fs.file-max = 1000000
 fs.nr_open = 1000000
 net.ipv4.netfilter.ip_conntrack_max = 1048576
 net.nf_conntrack_max = 1048576
+
+### 
+echo "1024 65535" >/proc/sys/net/ipv4/ip_local_port_range
