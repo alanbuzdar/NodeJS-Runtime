@@ -16,5 +16,7 @@ else {
     console.log(wss.clients.size);
     }, 5*1000);
 
-
+    wss.on('error', function(error) {
+            console.log(error);
+    });
 }
