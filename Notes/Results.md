@@ -123,3 +123,15 @@ One core had: 60839 connections
 While other had: 65520 connections
 
 To truly get to the bottom of the reason that can't get more connections I will need to find a better way to profile the performance.
+
+### Moving Keep-Alives to client
+
+Moving keep-alive to client seems to use way less CPU on server side but still fails around 125k.
+
+I tried running with just 1 core on server and it fails on 65223 connections. This is very similiar to the failure point of 1 of the two cores in cluster mode.
+
+just realized 65536 is linux's max file descriptor count! might be the cause!
+
+Apparently this was the issue. I had the right settings applied for my file descriptors but they didnt get applied until I actualyl exited the instance and ssh'd back in.
+
+Got 100k connections on core (but turns out pings werent working right on client)

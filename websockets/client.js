@@ -14,12 +14,12 @@ else {
     var ex = [];
     for(var i=0; i<30000; i++) {
         const clientNum = i;
-        var ws = new WebSocket('ws://localhost:8080', {
+        const ws = new WebSocket('ws://localhost:8080', {
         perMessageDeflate: false
             });
 
         ws.onerror = function(error) {
-            if(!hasFailed)
+            if(!hasFailed && clientNum != 0)
                 console.log('failed on: ' + clientNum + error);
             hasFailed = true;
         }
@@ -34,7 +34,7 @@ else {
                     ws.ping(null, null, true);
                     ws.keepAlive = true;
                 }
-            }, 5*1000); // milliseconds between pings
+            }, 25*1000); // milliseconds between pings
 
         });
         ws.on("pong", function() { 

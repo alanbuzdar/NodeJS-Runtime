@@ -19,4 +19,10 @@ else {
     wss.on('error', function(error) {
             console.log(error);
     });
+
+wss.on('connection', function connection(ws) {
+    // ws.on('ping', function() {
+    //     console.log("i got a ping")
+    // });
+});
 }
