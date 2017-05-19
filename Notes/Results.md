@@ -132,6 +132,26 @@ I tried running with just 1 core on server and it fails on 65223 connections. Th
 
 just realized 65536 is linux's max file descriptor count! might be the cause!
 
-Apparently this was the issue. I had the right settings applied for my file descriptors but they didnt get applied until I actualyl exited the instance and ssh'd back in.
+Apparently this was the issue. 
+
+I had the right settings applied for my file descriptors but they didnt get applied until I actualyl exited the instance and ssh'd back in.
 
 Got 100k connections on core (but turns out pings werent working right on client)
+
+Moved handling back to server.
+
+Got 150k connections with timeout of 10 seconds!
+
+At that point I get a 'ETIMEDOUTERROR'
+
+Changed Timeout to 25 seconds:
+
+Once again at 150k, all the connections timeout for some reason. Prior to this, the CPU is only getting 25 pct usage, but after the timeout, it get's stuck at 100. (which maybe is just from haviung to close all the connections)
+
+One interesting thing is the connections were split 90k/60k. Not evenly.
+
+What i really need is for the CPU to use every cycle.
+
+I discoverd the Node has a production mode.
+
+I tried running it in prod mode and it ran much faster but still fails at 150k connections. This time they were evenly split.
