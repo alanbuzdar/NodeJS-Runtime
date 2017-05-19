@@ -11,9 +11,10 @@ if (cluster.isMaster) {
 }
 else {
     var hasFailed = false;
+    var ex = [];
     for(var i=0; i<30000; i++) {
         const clientNum = i;
-        const ws = new WebSocket('ws://localhost:8080', {
+        var ws = new WebSocket('ws://localhost:8080', {
         perMessageDeflate: false
             });
 
@@ -34,10 +35,12 @@ else {
                     ws.keepAlive = true;
                 }
             }, 5*1000); // milliseconds between pings
-            ws.on("pong", function() { 
-                ws.keepAlive = false; 
-            });
+
         });
+        ws.on("pong", function() { 
+                ws.keepAlive = false; 
+        });
+        ex.push(ws);
         // ws.on('ping', function() {
         // });
     }

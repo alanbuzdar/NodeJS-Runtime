@@ -10,9 +10,9 @@ sudo apt-get update
 
 sudo apt-get install npm
 
-npm install
-
 cd NodeJS-Runtime/websockets
+
+npm install
 
 nodejs --nouse-idle-notification --max-old-space-size=4096 index.js
 
@@ -22,14 +22,14 @@ nodejs --nouse-idle-notification --max-old-space-size=4096 client.js
 
 --Old space size = size of "old space" in heap for GC
 
-/etc/security/limits.d/custom.conf
+sudo vim /etc/security/limits.d/custom.conf
 
 root soft nofile 1000000
 root hard nofile 1000000
 * soft nofile 1000000
 * hard nofile 1000000
 
-/etc/sysctl.conf
+sudo vim /etc/sysctl.conf
 
 fs.file-max = 1000000
 fs.nr_open = 1000000
