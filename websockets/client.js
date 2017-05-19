@@ -11,12 +11,12 @@ if (cluster.isMaster) {
 }
 else {
     var hasFailed = false;
-    var ex = [];
+    require('events').EventEmitter.prototype._maxListeners = 0;
     for(var i=0; i<30000; i++) {
         const clientNum = i;
         const ws = new WebSocket('ws://localhost:8080', {
-        perMessageDeflate: false
-            });
+            perMessageDeflate: false
+        });
 
         ws.onerror = function(error) {
             if(!hasFailed && clientNum != 0)
@@ -24,24 +24,8 @@ else {
             hasFailed = true;
         }
 
-        ws.on('open', function() {
-            // Send keep alive messages. Close if no response.
-            ws.keepAlive = false;
-            var interval = setInterval(function() {
-                if (ws.keepAlive) {
-                    ws.close();
-                } else {
-                    ws.ping(null, null, true);
-                    ws.keepAlive = true;
-                }
-            }, 25*1000); // milliseconds between pings
-
-        });
-        ws.on("pong", function() { 
-                ws.keepAlive = false; 
-        });
-        ex.push(ws);
         // ws.on('ping', function() {
+        //     console.log("got ping");
         // });
     }
 }

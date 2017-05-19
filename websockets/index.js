@@ -20,9 +20,19 @@ else {
             console.log(error);
     });
 
-wss.on('connection', function connection(ws) {
-    // ws.on('ping', function() {
-    //     console.log("i got a ping")
-    // });
-});
+    wss.on('connection', function connection(ws) {
+    // Send keep alive messages. Close if no response.
+            ws.keepAlive = false;
+            var interval = setInterval(function() {
+                if (ws.keepAlive) {
+                    ws.close();
+                } else {
+                    ws.ping(null, null, true);
+                    ws.keepAlive = true;
+                }
+            }, 10*1000); // milliseconds between pings
+            ws.on("pong", function() { 
+                ws.keepAlive = false; 
+            });
+    });
 }
