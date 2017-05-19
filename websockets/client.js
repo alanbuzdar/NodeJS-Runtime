@@ -22,6 +22,22 @@ else {
                 console.log('failed on: ' + clientNum + error);
             hasFailed = true;
         }
+
+        ws.on('open', function() {
+            // Send keep alive messages. Close if no response.
+            ws.keepAlive = false;
+            var interval = setInterval(function() {
+                if (ws.keepAlive) {
+                    ws.close();
+                } else {
+                    ws.ping(null, null, true);
+                    ws.keepAlive = true;
+                }
+            }, 5*1000); // milliseconds between pings
+            ws.on("pong", function() { 
+                ws.keepAlive = false; 
+            });
+        });
         // ws.on('ping', function() {
         // });
     }

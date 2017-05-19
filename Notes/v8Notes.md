@@ -35,3 +35,6 @@ Mark-Sweep (Less frequent but stop-the-world)
 V8 doesn't use dynamic lookup for properties (like normal JS)! Creates hidden classes and then reuses them.
 
 This allows it to use in-line caching: doesn't have to dynamically look up class method. cache it after first time.
+
+https://nodesource.com/blog/profiling-node-js-applications/
+
