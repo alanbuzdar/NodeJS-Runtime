@@ -10,9 +10,16 @@ sudo apt-get update
 
 sudo apt-get install npm
 
+sudo apt-get install nodejs-legacy
+
 cd NodeJS-Runtime/websockets
 
 npm install
+
+npm install --save-optional bufferutil
+
+npm install --save-optional utf-8-validate
+
 
 nodejs --nouse-idle-notification --max-old-space-size=4096 index.js
 
@@ -42,3 +49,5 @@ sudo su
 echo "1024 65535" >/proc/sys/net/ipv4/ip_local_port_range
 
 exit
+
+ nodejs --print_cumulative_gc_stat  --max-old-space-size=2000 --max-semi-space-size=2000 --nouse-idle-notification --noconcurrent_sweeping --trace_gc_ignore_scavenger index.js

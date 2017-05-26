@@ -177,3 +177,22 @@ The most interesting part for me was the following line:
 ### Next compiled some of the libraries to raw C++ and was able to get up to 200k!
 
  Moving it back and using binary addons allowed me to get 200k connections! 
+
+ I was able to debug the GC to see how it was working. Turns out my scavenging garbage collector was on:
+
+[10334:0x169dd80] [I:0x169dd80]    92649 ms: pause=21.8 mutator=1313.0 gc=s external=0.1 mark=0.0 sweep=0.00 sweepns=0.00 sweepos=0.00 sweepcode=0.00 sweepcell=0.00 sweepmap=0.00 evacuate=0.0 new_new=0.0 root_new=0.0 old_new=0.0 compaction_ptrs=0.0 intracompaction_ptrs=0.0 misc_compaction=0.0 weak_closure=0.0 inc_weak_closure=0.0 weakcollection_process=0.0 weakcollection_clear=0.0 weakcollection_abort=0.0 total_size_before=196867520 total_size_after=187883992 holes_size_before=1384928 holes_size_after=1255080 allocated=14305120 promoted=3222696 semi_space_copied=4303872 nodes_died_in_new=608 nodes_copied_in_new=605 nodes_promoted=389 promotion_ratio=19.5% average_survival_ratio=46.1% promotion_rate=99.0% semi_space_copy_rate=26.1% new_space_allocation_throughput=7312 context_disposal_rate=0.0 steps_count=193 steps_took=51.7 scavenge_throughput=824797
+
+As you can see, the promotion rate is really high
+
+https://gist.github.com/listochkin/10973974
+
+Also the scavenger GC is running extremely often:
+
+[10407:0x1c64e10]   158576 ms: Scavenge 263.9 (342.2) -> 263.4 (342.2) MB, 14.8 / 0 ms [allocation failure].
+[10407:0x1c64e10]   158704 ms: Scavenge 264.1 (342.2) -> 263.5 (342.2) MB, 14.7 / 0 ms [allocation failure].
+
+turning off scavenger.
+
+it seems the Mark-sweep GC is running fairly often as well. Usually only takes 4ms but a few times it took 700+ ms.
+
+AFter changing GC settings I am able to get 256k connections!
