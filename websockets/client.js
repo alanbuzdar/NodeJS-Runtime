@@ -24,6 +24,12 @@ else {
             hasFailed = true;
         }
 
+        ws.on('error') = function(error) {
+            if(!hasFailed && clientNum != 0)
+                console.log('failed on: ' + clientNum + error);
+            hasFailed = true;
+        }
+
         // ws.on('ping', function() {
         //     console.log("got ping");
         // });

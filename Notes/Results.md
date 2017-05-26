@@ -155,3 +155,19 @@ What i really need is for the CPU to use every cycle.
 I discoverd the Node has a production mode.
 
 I tried running it in prod mode and it ran much faster but still fails at 150k connections. This time they were evenly split.
+
+### 5/25
+
+The next step is to profile my node server to figure out what is going on.
+
+I was able to profile my server using v8's profiler
+
+The most interesting part for me was the following line:
+
+ 215851   63.2%   71.9%  epoll_pwait
+
+ This shows that the most ticks are spent on the epoll_pwait syscall
+
+ Investigating further it seems like most of what is taking the time is handling the pings for each client. I wonder if I can somehow do this more efficiently.
+
+ 
