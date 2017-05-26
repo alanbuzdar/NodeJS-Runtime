@@ -173,3 +173,7 @@ The most interesting part for me was the following line:
  ### I tried batching up my pings together instead of making them all have timers
 
  Unfortunately the code ran worse doing this and started failinga round 100k because sending pings to every client took so long that some would timeout
+
+### Next compiled some of the libraries to raw C++ and was able to get up to 200k!
+
+ Moving it back and using binary addons allowed me to get 200k connections! 
