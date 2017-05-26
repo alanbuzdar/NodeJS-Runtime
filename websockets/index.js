@@ -20,26 +20,11 @@ else {
             console.log(error);
     });
 
-    var interval = setInterval(function() {
-              wss.clients.forEach(function each(client) {
-                    client.ping(null, null, true);
-              });
-            }, 20*1000); // milliseconds between pings
-
-    /*wss.on('connection', function connection(ws) {
+    wss.on('connection', function connection(ws) {
     // Send keep alive messages. Close if no response.
             ws.keepAlive = false;
             var interval = setInterval(function() {
-                if (ws.keepAlive) {
-                    ws.close();
-                } else {
                     ws.ping(null, null, true);
-                    ws.keepAlive = true;
-                }
-            }, 10*1000); // milliseconds between pings
-            ws.on("pong", function() { 
-                ws.keepAlive = false; 
-            });
+            }, 10*1000); // milliseconds between pings        
     });
-    */
 }

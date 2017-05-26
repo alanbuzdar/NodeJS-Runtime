@@ -170,4 +170,6 @@ The most interesting part for me was the following line:
 
  Investigating further it seems like most of what is taking the time is handling the pings for each client. I wonder if I can somehow do this more efficiently.
 
- 
+ ### I tried batching up my pings together instead of making them all have timers
+
+ Unfortunately the code ran worse doing this and started failinga round 100k because sending pings to every client took so long that some would timeout
