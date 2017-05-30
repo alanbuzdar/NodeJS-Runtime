@@ -228,3 +228,5 @@ Turns out new space size cant be greather than 16384! setting it to this instead
 This means setting my old space to 2k instead of 4k actually improved performance. 
 
 no matter what i do with GC settings, kswapd0 comes in at 70 pct. Not sure if this means that this many connections just requires that much memory.
+
+For 250k connections to use my full 4Gb memory, this means each connection takes about 16kb. Websocket buffers usually take about 4kb per direction so that would be 8kb. With additional overhead for Node, i think this is possible.

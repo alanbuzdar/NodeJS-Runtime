@@ -50,6 +50,5 @@ echo "1024 65535" >/proc/sys/net/ipv4/ip_local_port_range
 
 exit
 
- nodejs --print_cumulative_gc_stat  --max-old-space-size=2000 --max-semi-space-size=16384 --nouse-idle-notification --noconcurrent_sweeping --trace_gc_ignore_scavenger index.js
+ nodejs --print_cumulative_gc_stat  --max-old-space-size=2000 --nouse-idle-notification --noconcurrent_sweeping --trace_gc_ignore_scavenger index.js
 
- 
