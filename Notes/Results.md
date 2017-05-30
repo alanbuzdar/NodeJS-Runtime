@@ -196,3 +196,17 @@ turning off scavenger.
 it seems the Mark-sweep GC is running fairly often as well. Usually only takes 4ms but a few times it took 700+ ms.
 
 AFter changing GC settings I am able to get 256k connections!
+
+### Test on 5/29
+
+To handle my pings better, I decided to have one timer that goes off for pings
+
+this is instead of having one timer for each connection handling pings
+
+For each timer, it will go through a portion of the clients and ping them
+
+This works smoothly  up to 275k connections.
+
+ However, at this point the program completely hangs and kswapd0 process starts. 
+
+ This process takes up almost all the CPU.
