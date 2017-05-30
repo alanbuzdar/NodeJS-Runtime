@@ -210,3 +210,7 @@ This works smoothly  up to 275k connections.
  However, at this point the program completely hangs and kswapd0 process starts. 
 
  This process takes up almost all the CPU.
+
+ to solve this I used:
+
+ echo vm.swappiness=0 | sudo tee -a /etc/sysctl.conf
