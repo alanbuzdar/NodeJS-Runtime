@@ -36,6 +36,6 @@ else {
                     ws.ping(null, null, true);
             }, 10*1000); // milliseconds between pings      
             */
-            clients.add(ws);  
+            clients.push(ws);  
     }); 
 }
