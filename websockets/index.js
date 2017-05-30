@@ -10,11 +10,20 @@ if (cluster.isMaster) {
         cluster.fork();
 }
 else {
-    const wss = new WebSocket.Server({ perMessageDeflate: false, port: 8080  });
-
+    const wss = new WebSocket.Server({ perMessageDeflate: false, port: 8080, keepalive: true });
+    var clients = [];
+    var index = 0;
     var connections = setInterval( function() {
     console.log(wss.clients.size);
     }, 5*1000);
+
+    var pings = setInterval( function() {
+        var start = index;
+        for(var i=0; i<500; i++) {
+                clients[(index+i)%clients.length].ping(null,null,true);        
+        }
+        index += 500;
+    }, 5*10);
 
     wss.on('error', function(error) {
             console.log(error);
@@ -22,9 +31,10 @@ else {
 
     wss.on('connection', function connection(ws) {
     // Send keep alive messages. Close if no response.
-            ws.keepAlive = false;
-            var interval = setInterval(function() {
+/*            var interval = setInterval(function() {
                     ws.ping(null, null, true);
-            }, 10*1000); // milliseconds between pings        
-    });
+            }, 10*1000); // milliseconds between pings      
+            */
+            clients.add(ws);  
+    }); 
 }
