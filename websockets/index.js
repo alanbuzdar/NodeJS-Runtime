@@ -20,7 +20,8 @@ else {
     var pings = setInterval( function() {
         var start = index;
         for(var i=0; i<500; i++) {
-                clients[(index+i)%clients.length].ping(null,null,true);        
+                var toPing = clients[(index+i)%clients.length];
+                if(toPing != null) toPing.ping(null,null,true);        
         }
         index += 500;
     }, 5*10);
