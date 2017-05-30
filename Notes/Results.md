@@ -214,3 +214,17 @@ This works smoothly  up to 275k connections.
  to solve this I used:
 
  echo vm.swappiness=0 | sudo tee -a /etc/sysctl.conf
+
+ Turns out reverting my batched ping idea actually allows me to get 280k. Once again, kswapd runs and stops me from accepting more connections.
+
+ I guess my solution didn't work.
+
+I tried using:  swapoff -a
+
+However, once again, kswapd0 runs at around 70 pct CPU usage
+
+Turns out new space size cant be greather than 16384! setting it to this instead. this explains some weird behaviour.
+
+This means setting my old space to 2k instead of 4k actually improved performance. 
+
+no matter what i do with GC settings, kswapd0 comes in at 70 pct. Not sure if this means that this many connections just requires that much memory.
