@@ -1,0 +1,34 @@
+Introduction
+Node.js is an extremely popular runtime system used primarily as a backbone for web frameworks like Express.
+In fact, in 2016, the number of questions about Node.js exceeded those for Ruby on Rails on StackOverflow [0]. 
+The framework has also been adopted by many companies including Uber, Netflix, and Paypal. At the same time, 
+the demand for a real-time web has grown. Web services are increasingly turning to WebSockets to serve real-time 
+data to customers. In 2016, all major browsers had adopted support for WebSockets [1]. For my project, I aimed to
+ learn more about JavaScript, Node.js and WebSockets by attempting to maximize the number of WebSocket connections 
+ I could handle with a Node.js application on a single cloud machine.
+ 
+Background
+I started by surveying background information on the technologies I was going to use in order to understand how to
+ optimize the number of concurrent connections.
+ 
+Node.js
+Node (Node.js) is an asynchronous event driven runtime for JavaScript which is built on Google’s V8 engine [2]. In Node,
+ there are no threads, instead all processing is triggered by events, which consist of messages or callbacks. This means 
+ a programmer doesn’t have to write complex multi-threaded code handling synchronization and dead-lock. It also means we 
+ can avoid context-switching, which is costly. Finally, it means that events can be processed while I/O is going on so CPU 
+ usage is optimized. In fact, Node almost never blocks unless waiting for events to process. Without going into too much detail, 
+ this is accomplished with an event loop which handles timers, callbacks, and polls incoming connections on every loop. If there are no
+  outstanding events, it simply sleeps. 
+ 
+Clusters
+It is a common misconception that Node can’t take advantage of multi-core machines because of its lack of threading support. However, this
+ is untrue because Node supports multiple processes running on the same machine through its Cluster module [3] [4]. This module allows a 
+ single master process and many worker processes to run on the same machine. These workers aren’t traditionally forked and don’t share memory
+  with each other, but they are able to share a port and are delegated connections to handle by the Master process.
+ 
+V8 Javascript Engine
+V8 is Google’s heavily optimized JavaScript engine used in Chrome as well as popular technologies like MongoDB and Node.js. Instead of interpreting
+ JS, it compiles it directly to machine code [5]. During runtime, the code is dynamically recompiled and techniques like inlining and inline caching
+  are used as well. In addition, it de-optimizes sometimes as well. Although JavaScript has no concept of a Class, V8 creates hidden class-like structures
+   at runtime to avoid dynamic lookup of properties [6].
+ 
