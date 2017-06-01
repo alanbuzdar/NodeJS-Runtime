@@ -52,3 +52,5 @@ exit
 
  nodejs --print_cumulative_gc_stat  --max-old-space-size=2000 --nouse-idle-notification --noconcurrent_sweeping --trace_gc_ignore_scavenger index.js
 
+sudo reboot
+

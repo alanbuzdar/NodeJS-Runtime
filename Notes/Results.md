@@ -209,15 +209,15 @@ This works smoothly  up to 275k connections.
 
  However, at this point the program completely hangs and kswapd0 process starts. 
 
- This process takes up almost all the CPU.
+This process takes up almost all the CPU.
 
- to solve this I used:
+to solve this I used:
 
- echo vm.swappiness=0 | sudo tee -a /etc/sysctl.conf
+echo vm.swappiness=0 | sudo tee -a /etc/sysctl.conf
 
- Turns out reverting my batched ping idea actually allows me to get 280k. Once again, kswapd runs and stops me from accepting more connections.
+Turns out reverting my batched ping idea actually allows me to get 280k. Once again, kswapd runs and stops me from accepting more connections.
 
- I guess my solution didn't work.
+I guess my solution didn't work.
 
 I tried using:  swapoff -a
 
@@ -230,3 +230,19 @@ This means setting my old space to 2k instead of 4k actually improved performanc
 no matter what i do with GC settings, kswapd0 comes in at 70 pct. Not sure if this means that this many connections just requires that much memory.
 
 For 250k connections to use my full 4Gb memory, this means each connection takes about 16kb. Websocket buffers usually take about 4kb per direction so that would be 8kb. With additional overhead for Node, i think this is possible.
+
+## 5/31
+
+server with no flags: 256k
+
+with no-use-idle-notification: 256k / For some reason load unevenly distributed.
+
+changing max memory doesn't seem to affect and connections still lopsided
+
+turning off concurrent sweeping seemed to make connections even?
+
+Mark sweep takes more than a full second!
+
+ Postpone entering high promotion mode as optimized pretenuring code is still being generated
+
+Swappiness was the setting that brought us to 280k.
