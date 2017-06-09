@@ -32,3 +32,108 @@ V8 is Google’s heavily optimized JavaScript engine used in Chrome as well as p
   are used as well. In addition, it de-optimizes sometimes as well. Although JavaScript has no concept of a Class, V8 creates hidden class-like structures
    at runtime to avoid dynamic lookup of properties [6].
  
+WebSockets
+WebSockets are a communication protocol which provides a full-duplex channel over a TCP connection [9]. The biggest difference between WebSockets and 
+traditional sockets are they can be negotiated and opened over an HTTP connection and allow direct communication between the server and the browser.
+ The other major difference between WebSockets and TCP sockets is that WebSockets have a concept of distinct ‘messages’ whereas TCP is simply a stream of bytes.
+ 
+Performance-Driven Optimization
+My approach was to iteratively test how many concurrent connections I could handle. I would then make changes and see whether they improved performance or made
+ it worse. 
+ 
+Setup
+For my experiments, I deployed to an AWS t2.medium instance running Ubuntu Server 16.04 LTS. I chose this instance because it had a decent amount of memory (4GB)
+ and also was the cheapest instance with two CPU cores. This allowed to me to test cluster mode to see whether Node actually scales well to multiple cores. I
+  created client programs which connect to the server with WebSockets in order to load test it. I also created  a server program which simply accepts WebSocket 
+  connections and sends an occasional ping to the client to keep the connection alive and detect if it is closed.
+ 
+I started by attempting to replicate the results from [10]. This blog performed their tests using an m3.xlarge server which has 4 CPU’s and 15 Gb of memory and the
+ user was able to get 600k concurrent connections. Due to hardware differences, it clearly isn’t fair to compare my number of connections to theirs directly. Instead, 
+ I’ve decided to compare the cost per thousand concurrent connections. From now on I will refer to this figure as CPC and it is calculated by the monthly instance cost
+  divided by the number of connections handled in thousands. I believe this is a fair metric because it takes into account what most businesses would care about. The CPC
+   for the blog post is 169.36/600 = 0.28. This means we are paying about 28 cents a month for every 1,000 concurrent connections we want the capacity to handle. This will 
+   be used as a ruler to compare our results to.
+ 
+What follows is descriptions of all my major iterations and their results. Minor iterations are excluded, but a larger record of my iterations can be found in Results.md.
+ 
+Baseline Test
+I started by replicating the application and OS settings found in [10] without clustering. This resulted in 54k concurrent connections before failure. It was surprising that 
+the server could handle this many connections without any optimizations. The CPC for this is 32.49/54 = 0.60 or about 60 cents for every thousand connections. This means we are
+ starting out at a little less than half the efficiency of the blog post.
+ 
+Scaling to Two Cores
+My next step was to use the Cluster Module to see if using multiple cores could allow me to handle more connections. Although this might seem obvious, it’s possible that it could 
+have no effect because the application is mostly I/O bound, not CPU bound. After expanding the program to run on two processes, one for each core, it was able to handle over 70,000 
+connections before the clients started to get an EADDRNOTAVAIL error. This is a CPC of 0.46. 
+ 
+After researching the error, it turns out that it had to do with the number of ports that were available to the client to create in the OS settings [11]. This wasn’t something mentioned
+ in the blog post. After changing a config file, I was able to handle 100k connections total with a CPC of 0.32. This is almost double the connections handled with a single core and means 
+ we almost have linear scaling with worker count so far.
+ 
+Multiple Workers Per Core
+Since scaling to two workers resulted in linear performance gain, the next approach I wanted to try was multiple workers per core. My next test was using 4 total workers, 2 per core. 
+However, the results were exactly the same and the server failed around 100k connections.
+ 
+Changing The Scheduling Algorithm
+I wanted to experiment with different scheduling algorithms for how the Master process delegates connections to the Workers. The default policy is Node itself handling connections using 
+Round-Robin with slight modifications. One can also choose to delegate the scheduling to the OS or have the Master open all connections itself and have workers request connections when they
+ are ready. However, none of the options for scheduling resulted in better performance than the simple default Round-Robin.
+ 
+Adjusting Keep-Alives
+The server essentially only has two jobs: accepting connections and sending pings as keep-alives for the WebSocket. To reduce the amount of work, I wanted to find a balance of how often
+ to ping the client such that it doesn’t timeout but reduces the workload. I found that around 25 seconds was a good balance. This allowed me to get 125k connections before getting a “socket
+  hang up” on the client side with a CPC of 0.26. Finally, my CPC is less than that of the blog post (.28)!
+ 
+Next, I tried moving keep-alive’s to the client instead of the server, but this would mean the server wouldn’t know when a client disconnects, so I reversed this decision.
+ 
+Each core seemed to be handling around 65,223 connections when failing. I found this suspicious because it was very close to 65,536 which is 2^16. Since connection counts only print every 
+5 seconds, it was most likely that each core was reaching 2^16 connections then failing. As it turns out, Linux has a maximum file descriptor count of 65,536 and each socket uses one file descriptor [12].
+ As it turns out, even though I had previously increased the file descriptor limit, the settings hadn’t been applied yet and I had to reset the instance for it to work properly. Finally, after fixing this, 
+ my connection limit reached 150k and a CPC of 0.22.
+ 
+Batching Pings
+After my prior optimizations, it was difficult to tell how to proceed. It appeared that my CPU and memory usage were only reaching a quarter of their capacity. I also profiled my code and noticed this:
+ 215851   63.2%   71.9%  epoll_pwait
+63 percent of CPU ticks were spent in the epoll_pwait method. This the method that polls for events to handle. At this point, I wanted a way to use my CPU more and spend less time waiting. My next idea
+ was to ping all clients in a loop occasionally instead of having the ping be handled in callbacks. This would use a lot more of the CPU. However, this resulted in only being able to handle 100k connections 
+ because the loop took too long and connections would time out.
+ 
+ 
+BufferUtil and UTF-8-Validate
+While looking at the documentation for the WebSocket library I was using, I noticed there were two optional libraries that I could add that would improve performance. Both of these were binary addons that
+ were written in C++ which efficiently handle specific tasks as opposed to just using Javascript. Surprisingly, this was one of the most effective optimizations I made, allowing me to scale to 200k connections
+  and 0.16 CPC. 
+ 
+Garbage Collection
+To get an idea for further optimizations I decided to profile the Garbage Collector to see if it was affecting performance. What I found was that the Scavenger GC was running very frequently and had a 
+promotion rate of 97%. However, most scavenges ran very quickly. After waiting some, the Mark-Sweep GC also started running often. Most times it ran with 4 ms steps (incremental marking), but occasionally
+ it’d take over 700 ms! This is definitely enough to affect my program. After testing many configurations for the GC, the ones that most helped my performance were making the semi-space as large as 
+ possible, making the old space max size 4gb, and turning off concurrent sweeping. This actually meant that the stop-the-world collector wouldn’t run during my experiment and therefore I wouldn’t risk 
+ timing out. This brought my total concurrent connection count to 256k, or a CPC of 0.13. We are finally under half the CPC as the blog post. Profiling the GC really helped to get to this point.
+ 
+Swapping
+At this point, I noticed that at around 70 percent memory usage, the kswapd process would start taking the full CPU and my server would hang. In order to avoid this, I had to change the OS swappiness 
+settings to 0 which tells the kernel not to swap. This enabled me to get to 280k connections and then kswapd runs again. In the Top process, it seems the full memory still isn’t being used, but it does 
+allow me to handle more connections than without this setting. This was the final benchmark I was able to test. My final CPC was .116, around a 2.5x improvement over the blog post and 5x over my baseline.
+ 
+Conclusion
+Doing this project taught me a lot about JavaScript, Node.js, WebSockets, and Operating Systems. One major lesson I learned is that a lot of the solutions for scalability are actually at the OS level and
+ not at the runtime level. This was pretty enlightening. Other than adding concurrency (which was extremely effective), the most effective steps I took did not involve changing the code. For instance, using
+  C++ addons as opposed to Javascript. I was also surprised I didn’t get more gains from different scheduling or Garbage Collector settings.
+ 
+ 
+Sources
+ 
+[0] https://www.quora.com/How-popular-is-Node-js-in-2017
+[1] http://caniuse.com/#search=websockets
+[2] https://nodejs.org/en/about/
+[3] https://stackoverflow.com/questions/2387724/node-js-on-multi-core-machines
+[4] https://nodejs.org/docs/latest/api/cluster.html
+[5] https://github.com/v8/v8/wiki/Introduction
+[6] http://thibaultlaurens.github.io/javascript/2013/04/29/how-the-v8-engine-works/
+[7] https://v8project.blogspot.com/2015/08/getting-garbage-collection-for-free.html
+[8] https://github.com/thlorenz/v8-perf/blob/master/gc.md
+[9] https://en.wikipedia.org/wiki/WebSocket
+[10]blog.jayway.com/2015/04/13/600k-concurrent-websocket-connections-on-aws-using-node-js
+[11] http://www.toptip.ca/2010/02/linux-eaddrnotavail-address-not.html
+[12] unix.stackexchange.com/questions/36841/why-is-number-of-open-files-limited-in-linux
